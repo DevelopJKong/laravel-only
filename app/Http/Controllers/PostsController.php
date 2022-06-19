@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StorePost;
 use App\Models\BlogPost;
 use Illuminate\Http\Request;
 
@@ -24,7 +25,7 @@ class PostsController extends Controller
      */
     public function create()
     {
-        //
+        return view('posts.create');
     }
 
     /**
@@ -33,18 +34,24 @@ class PostsController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StorePost $request)
     {
-        //
+        $validated = $request->validated();
+        $post = BlogPost::create($validated);
+
+        $request->session()->flash('status', 'The blog was created');
+
+        return redirect()->route('posts.show', ['post' => $post->id]);
+
     }
 
     /**
      * Display the specified resource.
      *
-     * @param \App\Models\resource $resource
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function show(resource $resource)
+    public function show($id)
     {
         //
     }
@@ -52,10 +59,10 @@ class PostsController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param \App\Models\resource $resource
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(resource $resource)
+    public function edit($id)
     {
         //
     }
@@ -64,10 +71,10 @@ class PostsController extends Controller
      * Update the specified resource in storage.
      *
      * @param \Illuminate\Http\Request $request
-     * @param \App\Models\resource $resource
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, resource $resource)
+    public function update(Request $request,$id)
     {
         //
     }
@@ -75,11 +82,16 @@ class PostsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param \App\Models\resource $resource
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(resource $resource)
+    public function destroy($id)
     {
-        //
+        $post = BlogPost::findOrFail($id);
+        $post->delete();
+
+        session()->flash('status','The blog post was deleted');
+
+        return redirect()->route('posts.index');
     }
 }
